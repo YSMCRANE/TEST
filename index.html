@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V5.9.1 (UI Fix)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.0 (Eq Edit)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -244,7 +244,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v5.9.1</span>
+      <span class="sub-text">통합 관리 시스템 v6.0</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -536,11 +536,36 @@
 
 <div id="phoneModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>📞 연락처 수정</h3><span class="close-modal" onclick="closeModal('phoneModal')">&times;</span></div><div class="modal-body"><div class="form-grid" style="grid-template-columns: 1fr;"><div class="form-group"><label>부서</label><input type="text" id="m_pbDept"></div><div class="form-group"><label>직책</label><input type="text" id="m_pbPos"></div><div class="form-group"><label>이름</label><input type="text" id="m_pbName"></div><div class="form-group"><label>전화번호</label><input type="text" id="m_pbPhone"></div></div></div><div class="modal-footer"><button onclick="closeModal('phoneModal')">취소</button><button onclick="savePhoneFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 <div id="bucketModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>🪣 버켓 기록 수정</h3><span class="close-modal" onclick="closeModal('bucketModal')">&times;</span></div><div class="modal-body"><div class="form-grid" style="grid-template-columns: 1fr;"><div class="form-group"><label>부서/호기</label><input type="text" id="m_bkDept"></div><div class="form-group"><label>날짜</label><input type="date" id="m_bkDate"></div><div class="form-group"><label>비고</label><input type="text" id="m_bkNote"></div></div></div><div class="modal-footer"><button onclick="closeModal('bucketModal')">취소</button><button onclick="saveBucketFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
-<div id="specModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>🔧 설비 상세 스펙 편집</h3><span class="close-modal" onclick="closeModal('specModal')">&times;</span></div><div class="modal-body"><div id="modalMetaInfo" style="margin-bottom:15px; color:var(--primary-color); font-weight:bold;"></div><table class="spec-table" id="modalSpecTable" style="width:100%; margin-bottom:15px; border-collapse:collapse;"><thead><tr><th style="width:40%">항목명 (Key)</th><th style="width:40%">값 (Value)</th><th style="width:20%">삭제</th></tr></thead><tbody></tbody></table><button onclick="addModalRow()" style="width:100%; border:1px dashed #555;" class="admin-only">+ 항목 추가</button></div><div class="modal-footer"><button onclick="closeModal('specModal')">취소</button><button onclick="saveSpecFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
+
+<div id="specModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🔧 설비 상세 스펙 편집</h3>
+      <span class="close-modal" onclick="closeModal('specModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="specBasicInfo" class="form-grid" style="margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:15px;">
+         <div class="form-group"><label>팀</label><input type="text" id="m_esTeam_modal"></div>
+         <div class="form-group"><label>설비ID</label><input type="text" id="m_esEqId_modal"></div>
+         <div class="form-group"><label>위치</label><input type="text" id="m_esLocation_modal"></div>
+      </div>
+      
+      <table class="spec-table" id="modalSpecTable" style="width:100%; margin-bottom:15px; border-collapse:collapse;">
+        <thead><tr><th style="width:40%">항목명 (Key)</th><th style="width:40%">값 (Value)</th><th style="width:20%">삭제</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button onclick="addModalRow()" style="width:100%; border:1px dashed #555;" class="admin-only">+ 항목 추가</button>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('specModal')">취소</button>
+      <button onclick="saveSpecFromModal()" class="btn-primary admin-only">수정 저장</button>
+    </div>
+  </div>
+</div>
 
 <script>
   // [중요] 반드시 본인의 최신 Web App URL로 교체하세요!
-  const API_URL = "https://script.google.com/macros/s/AKfycbwxFkg9RhNj5E3ElELv-JtUuDHGNs9baUKKMz6eyPLN-AB_m6PFSBWRX43vlXeGR-YnFA/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxtKtPDvM6u4E4FzxZcYv32We4VJ2SrHL2Bh21u8vVjRfGMNueMntOXfnQ2jFQTK3AMOQ/exec";
   
   /* --- [보안] 로그인 설정 --- */
   const PW_ADMIN = "1984"; // 관리자용 (수정/삭제 가능)
@@ -901,10 +926,100 @@
   tr.innerHTML=`<td>${r[0]}</td><td style="font-weight:bold; color:var(--primary-color);">${r[1]}</td><td>${r[2]||'-'}</td><td style="font-size:0.9em; line-height:1.4;">${specDisplay}</td><td><button onclick='openSpecModal("edit", ${it.row})' class="admin-only">📝 상세/수정</button> <button onclick='deleteEquipmentSpec(${it.row})' class="btn-danger admin-only">🗑️</button></td>`; tb.appendChild(tr); }); renderPaginator("esPagination",totalPages,(p)=>{esPage=p;renderEquipmentTable();},esPage); }
   function resetEquipmentFilter() { document.getElementById('filterTeam').value = ""; document.getElementById('filterLoc').value = ""; updateLocationOptions(); document.getElementById('esSearch').value = ""; esPage = 1; renderEquipmentTable(); }
   document.getElementById('filterTeam').addEventListener('change', () => { updateLocationOptions(); esPage=1; renderEquipmentTable(); }); document.getElementById('filterLoc').addEventListener('change', () => { esPage=1; renderEquipmentTable(); }); document.getElementById("esSearch").addEventListener("input", () => { esPage=1; renderEquipmentTable(); });
-  function openSpecModal(mode, row = null) { const tbody = document.querySelector("#modalSpecTable tbody"); tbody.innerHTML = ""; const metaInfo = document.getElementById("modalMetaInfo"); if (mode === 'new') { const team=document.getElementById('esTeam').value, id=document.getElementById('esEqId').value; if(!team || !id) { alert("필수"); return; } currentSpecRow=null; metaInfo.textContent=`신규: [${team}] ${id}`; defaultSpecs.forEach(k => addModalRow(k, "")); } else { currentSpecRow = row; const data = esRowMap.get(row); metaInfo.textContent = `수정: [${data[0]}] ${data[1]}`; try { const json = JSON.parse(data[3]); Object.entries(json).forEach(([k,v])=>addModalRow(k,v)); } catch { defaultSpecs.forEach(k => addModalRow(k, "")); } } openModal('specModal'); }
+  
+  // [수정] 모달 열기 함수: 입력 필드에 값 채워넣기
+  function openSpecModal(mode, row = null) { 
+      const tbody = document.querySelector("#modalSpecTable tbody"); 
+      tbody.innerHTML = ""; 
+      
+      const inTeam = document.getElementById("m_esTeam_modal");
+      const inEqId = document.getElementById("m_esEqId_modal");
+      const inLoc = document.getElementById("m_esLocation_modal");
+
+      if (mode === 'new') { 
+          // 신규 등록 시: 상단 입력바의 값을 가져와서 채움
+          const topTeam = document.getElementById('esTeam').value;
+          const topEqId = document.getElementById('esEqId').value;
+          const topLoc = document.getElementById('esLocation').value;
+          
+          if(!topTeam || !topEqId) { alert("상단의 팀과 설비ID를 먼저 입력해주세요."); return; } 
+          
+          currentSpecRow = null; 
+          inTeam.value = topTeam;
+          inEqId.value = topEqId;
+          inLoc.value = topLoc;
+          
+          defaultSpecs.forEach(k => addModalRow(k, "")); 
+      } else { 
+          // 수정 시: 기존 데이터 로드
+          currentSpecRow = row; 
+          const data = esRowMap.get(row); 
+          
+          inTeam.value = data[0];
+          inEqId.value = data[1];
+          inLoc.value = data[2];
+          
+          try { 
+              const json = JSON.parse(data[3]); 
+              Object.entries(json).forEach(([k,v])=>addModalRow(k,v)); 
+          } catch { 
+              defaultSpecs.forEach(k => addModalRow(k, "")); 
+          } 
+      } 
+      openModal('specModal'); 
+  }
+
   function addModalRow(key="", value="") { const tbody = document.querySelector("#modalSpecTable tbody"); const tr = document.createElement("tr"); 
   tr.innerHTML = `<td><input type="text" value="${key}" style="width:95%"></td><td><input type="text" value="${value}" style="width:95%"></td><td style="text-align:center;"><button onclick="this.closest('tr').remove()" class="btn-danger">x</button></td>`; tbody.appendChild(tr); }
-  async function saveSpecFromModal() { const rows = document.querySelectorAll("#modalSpecTable tbody tr"); const newSpec = {}; rows.forEach(tr => { const inputs = tr.querySelectorAll("input"); if(inputs[0].value) newSpec[inputs[0].value] = inputs[1].value; }); const specStr = JSON.stringify(newSpec); if (currentSpecRow === null) { const team=document.getElementById('esTeam').value, eqId=document.getElementById('esEqId').value, location=document.getElementById('esLocation').value; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"spec_add", team, eqId, location, spec: specStr})}); document.getElementById('esTeam').value=""; document.getElementById('esEqId').value=""; document.getElementById('esLocation').value=""; } else { const old = esRowMap.get(currentSpecRow); await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"spec_update", row: currentSpecRow, team: old[0], eqId: old[1], location: old[2], spec: specStr})}); } closeModal('specModal'); alert("저장됨"); loadEquipmentSpec(); }
+  
+  // [수정] 저장 함수: 입력 필드의 값을 읽어서 전송
+  async function saveSpecFromModal() { 
+      const rows = document.querySelectorAll("#modalSpecTable tbody tr"); 
+      const newSpec = {}; 
+      rows.forEach(tr => { 
+          const inputs = tr.querySelectorAll("input"); 
+          if(inputs[0].value) newSpec[inputs[0].value] = inputs[1].value; 
+      }); 
+      const specStr = JSON.stringify(newSpec); 
+      
+      // 모달 내부 입력값 읽기
+      const newTeam = document.getElementById("m_esTeam_modal").value;
+      const newEqId = document.getElementById("m_esEqId_modal").value;
+      const newLoc = document.getElementById("m_esLocation_modal").value;
+
+      if (currentSpecRow === null) { 
+          await fetch(API_URL, {
+              method:"POST",
+              body:JSON.stringify({
+                  action:"spec_add", 
+                  team: newTeam, 
+                  eqId: newEqId, 
+                  location: newLoc, 
+                  spec: specStr
+              })
+          }); 
+          // 상단 입력창 초기화
+          document.getElementById('esTeam').value=""; 
+          document.getElementById('esEqId').value=""; 
+          document.getElementById('esLocation').value=""; 
+      } else { 
+          await fetch(API_URL, {
+              method:"POST",
+              body:JSON.stringify({
+                  action:"spec_update", 
+                  row: currentSpecRow, 
+                  team: newTeam, 
+                  eqId: newEqId, 
+                  location: newLoc, 
+                  spec: specStr
+              })
+          }); 
+      } 
+      closeModal('specModal'); 
+      alert("저장됨"); 
+      loadEquipmentSpec(); 
+  }
+  
   async function deleteEquipmentSpec(row){ if(confirm("삭제?")) { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"spec_delete",row})}); loadEquipmentSpec(); } }
 
   /* 초기화 */
@@ -912,5 +1027,3 @@
 </script>
 </body>
 </html>
-
-
