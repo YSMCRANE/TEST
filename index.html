@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V5.7 (Eq Link)</title>
+  <title>(주)영선기계 통합 관리 시스템 V5.9 (Col I)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -244,7 +244,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v5.7</span>
+      <span class="sub-text">통합 관리 시스템 v5.9</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -282,8 +282,8 @@
           <form id="scheduleForm" class="flex-row">
             <input type="date" name="날짜" id="inputDate" required />
             <input type="text" name="생산팀" id="i_schTeam" placeholder="생산팀" required />
-            <input type="text" name="설비ID" id="i_schEqId" placeholder="설비ID (예:KC-01)" />
             <input type="text" name="작업내용" id="i_schWork" placeholder="작업내용" required />
+            <input type="text" name="설비ID" id="i_schEqId" placeholder="설비ID (예:KC-01)" />
             <input type="text" name="담당자" id="i_schManager" placeholder="담당자" required />
             <input type="text" name="발주번호" id="i_schOrderNo" placeholder="발주번호" required />
             <input type="text" name="필수자재" id="i_schMat" placeholder="필수자재" />
@@ -321,7 +321,7 @@
             </div>
             <div class="table-container">
               <table id="scheduleTable">
-                <thead><tr><th>날짜</th><th>생산팀</th><th>설비ID</th><th>작업내용</th><th>담당자</th><th>발주번호</th><th>필수자재</th><th>허가번호</th><th>비고</th><th>관리</th></tr></thead>
+                <thead><tr><th>날짜</th><th>생산팀</th><th>작업내용</th><th>담당자</th><th>발주번호</th><th>필수자재</th><th>허가번호</th><th>비고</th><th>설비ID</th><th>관리</th></tr></thead>
                 <tbody></tbody>
               </table>
             </div>
@@ -497,8 +497,8 @@
       <div class="form-grid">
         <div class="form-group"><label>날짜</label><input type="date" id="n_schDate"></div>
         <div class="form-group"><label>생산팀</label><input type="text" id="n_schTeam"></div>
-        <div class="form-group"><label>설비ID</label><input type="text" id="n_schEqId"></div>
         <div class="form-group"><label>작업내용</label><input type="text" id="n_schWork"></div>
+        <div class="form-group"><label>설비ID</label><input type="text" id="n_schEqId"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="n_schManager"></div>
         <div class="form-group"><label>발주번호</label><input type="text" id="n_schOrderNo"></div>
         <div class="form-group"><label>필수자재</label><input type="text" id="n_schMat"></div>
@@ -517,8 +517,8 @@
       <div class="form-grid">
         <div class="form-group"><label>날짜</label><input type="date" id="m_schDate"></div>
         <div class="form-group"><label>생산팀</label><input type="text" id="m_schTeam"></div>
-        <div class="form-group"><label>설비ID</label><input type="text" id="m_schEqId"></div>
         <div class="form-group"><label>작업내용</label><input type="text" id="m_schWork"></div>
+        <div class="form-group"><label>설비ID</label><input type="text" id="m_schEqId"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="m_schManager"></div>
         <div class="form-group"><label>발주번호</label><input type="text" id="m_schOrderNo"></div>
         <div class="form-group"><label>필수자재</label><input type="text" id="m_schMat"></div>
@@ -540,7 +540,7 @@
 
 <script>
   // [중요] 반드시 본인의 최신 Web App URL로 교체하세요!
-  const API_URL = "https://script.google.com/macros/s/AKfycbw-gMhhCggQk2Wah6piyHizpicD80e87u4sM87FVEs2DSI-WojMxKyHrZIbvKHk6EOcjQ/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzqNF0h7XHiZjRItXiehqLKTAnwMo22AMD3HqYqxd5Gz90GrJ-FWx_umB_CXh2C60L1/exec";
   
   /* --- [보안] 로그인 설정 --- */
   const PW_ADMIN = "1984"; // 관리자용 (수정/삭제 가능)
@@ -593,10 +593,10 @@
   let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null;
   function normalizeBool(val) { if (val === true || val === false) return val; if (!val) return false; const str = String(val).trim().toUpperCase(); return str === 'TRUE' || str === '허가' || str === '완료'; }
 
-  /* ================= 1. 일정관리 (설비ID 링크 추가) ================= */
+  /* ================= 1. 일정관리 (설비ID 링크 추가 - I열) ================= */
   const schedulePageSize=10; 
-  // [수정] FIELDS 배열에 "설비ID" 추가
-  const FIELDS=["날짜","생산팀","설비ID","작업내용","담당자","발주번호","필수자재","허가번호","비고"];
+  // [수정] 순서를 I열(마지막)에 설비ID가 오도록 변경
+  const FIELDS=["날짜","생산팀","작업내용","담당자","발주번호","필수자재","허가번호","비고","설비ID"];
   let schedulePage=1, records=[], searchQuery="", sortKey="날짜", sortAsc=true, dateFilter={start:null, end:null}; 
   let scheduleChartInstance = null; let currentView = 'list'; let currentCalendarDate = new Date(); let selectedDate = TODAY_DATE_STR; 
 
@@ -610,13 +610,12 @@
       if (view === 'calendar') { renderCalendar(); updateDetailPanel(selectedDate); } else { renderSchedule(); }
   }
   
-  // [신규] 설비ID 클릭 시 이동 및 검색 함수
   function goToEquipmentSpec(eqId) {
     if(!eqId) return;
-    switchTab('equipment'); // 탭 이동
+    switchTab('equipment'); 
     const searchInput = document.getElementById('esSearch');
-    searchInput.value = eqId; // 검색창 입력
-    searchInput.dispatchEvent(new Event('input')); // 검색 트리거
+    searchInput.value = eqId; 
+    searchInput.dispatchEvent(new Event('input')); 
   }
 
   function changeMonth(delta) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta); renderCalendar(); }
@@ -627,7 +626,7 @@
   
   async function saveNewScheduleFromModal(){
       const date = document.getElementById('n_schDate').value, team = document.getElementById('n_schTeam').value;
-      const eqId = document.getElementById('n_schEqId').value; // [추가]
+      const eqId = document.getElementById('n_schEqId').value;
       const work = document.getElementById('n_schWork').value, manager = document.getElementById('n_schManager').value;
       const orderNo = document.getElementById('n_schOrderNo').value, mat = document.getElementById('n_schMat').value;
       const permit = document.getElementById('n_schPermit').value, note = document.getElementById('n_schNote').value;
@@ -670,7 +669,6 @@
       list.forEach(r => {
           const div = document.createElement("div"); div.className = "sch-item-card";
           let html = `<div class="sch-team">${r['생산팀']}</div>`;
-          // 설비ID가 있으면 표시
           if(r['설비ID']) html += `<div style="font-size:0.85em; color:var(--accent-color); cursor:pointer;" onclick="goToEquipmentSpec('${r['설비ID']}')">🔗 ${r['설비ID']}</div>`;
           html += `<div class="sch-work">${r['작업내용']}</div>`;
           
@@ -721,7 +719,6 @@
       FIELDS.forEach(k => {
         const td = document.createElement("td"); let val = (k==="날짜" ? formatDate(r[k]) : r[k]);
         if(k==="날짜" && val===TODAY_DATE_STR) { td.classList.add("text-red"); td.textContent = val; } 
-        // [수정] 설비ID 링크 처리
         else if (k === "설비ID" && val) { td.innerHTML = `<span class="link-text" onclick="goToEquipmentSpec('${val}')">🔗 ${val}</span>`; }
         else if (k === "발주번호" && val) { td.innerHTML = `<span class="link-text" onclick="searchOrderByPO('${val}')">${val}</span>`; } 
         else { td.textContent = val; }
@@ -738,7 +735,7 @@
   function openScheduleModal(row){
       currentSchRow = row; const rec = records.find(r => r.row === row); if(!rec) return;
       document.getElementById('m_schDate').value = formatDate(rec["날짜"]); document.getElementById('m_schTeam').value = rec["생산팀"];
-      document.getElementById('m_schEqId').value = rec["설비ID"]; // [추가]
+      document.getElementById('m_schEqId').value = rec["설비ID"];
       document.getElementById('m_schWork').value = rec["작업내용"]; document.getElementById('m_schManager').value = rec["담당자"];
       document.getElementById('m_schOrderNo').value = rec["발주번호"]; document.getElementById('m_schMat').value = rec["필수자재"];
       document.getElementById('m_schPermit').value = rec["허가번호"]; document.getElementById('m_schNote').value = rec["비고"];
@@ -747,7 +744,7 @@
   
   async function saveScheduleFromModal(){
       const date=document.getElementById('m_schDate').value, team=document.getElementById('m_schTeam').value;
-      const eqId=document.getElementById('m_schEqId').value; // [추가]
+      const eqId=document.getElementById('m_schEqId').value;
       const work=document.getElementById('m_schWork').value, manager=document.getElementById('m_schManager').value;
       const orderNo=document.getElementById('m_schOrderNo').value;
       const mat=document.getElementById('m_schMat').value, permit=document.getElementById('m_schPermit').value, note=document.getElementById('m_schNote').value;
@@ -915,4 +912,3 @@
 </script>
 </body>
 </html>
-
