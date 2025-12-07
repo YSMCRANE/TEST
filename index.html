@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V5.9 (Col I)</title>
+  <title>(주)영선기계 통합 관리 시스템 V5.9.1 (UI Fix)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -244,7 +244,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v5.9</span>
+      <span class="sub-text">통합 관리 시스템 v5.9.1</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -283,12 +283,12 @@
             <input type="date" name="날짜" id="inputDate" required />
             <input type="text" name="생산팀" id="i_schTeam" placeholder="생산팀" required />
             <input type="text" name="작업내용" id="i_schWork" placeholder="작업내용" required />
-            <input type="text" name="설비ID" id="i_schEqId" placeholder="설비ID (예:KC-01)" />
             <input type="text" name="담당자" id="i_schManager" placeholder="담당자" required />
             <input type="text" name="발주번호" id="i_schOrderNo" placeholder="발주번호" required />
             <input type="text" name="필수자재" id="i_schMat" placeholder="필수자재" />
             <input type="text" name="허가번호" id="i_schPermit" placeholder="허가번호" />
             <input type="text" name="비고" placeholder="비고" />
+            <input type="text" name="설비ID" id="i_schEqId" placeholder="설비ID (예:KC-01)" />
             <button type="submit" class="btn-primary">추가</button>
           </form>
         </div>
@@ -498,12 +498,12 @@
         <div class="form-group"><label>날짜</label><input type="date" id="n_schDate"></div>
         <div class="form-group"><label>생산팀</label><input type="text" id="n_schTeam"></div>
         <div class="form-group"><label>작업내용</label><input type="text" id="n_schWork"></div>
-        <div class="form-group"><label>설비ID</label><input type="text" id="n_schEqId"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="n_schManager"></div>
         <div class="form-group"><label>발주번호</label><input type="text" id="n_schOrderNo"></div>
         <div class="form-group"><label>필수자재</label><input type="text" id="n_schMat"></div>
         <div class="form-group"><label>허가번호</label><input type="text" id="n_schPermit"></div>
         <div class="form-group"><label>비고</label><input type="text" id="n_schNote"></div>
+        <div class="form-group"><label>설비ID</label><input type="text" id="n_schEqId"></div>
       </div>
     </div>
     <div class="modal-footer"><button onclick="closeModal('addScheduleModal')">취소</button><button onclick="saveNewScheduleFromModal()" class="btn-primary admin-only">등록 완료</button></div>
@@ -518,12 +518,12 @@
         <div class="form-group"><label>날짜</label><input type="date" id="m_schDate"></div>
         <div class="form-group"><label>생산팀</label><input type="text" id="m_schTeam"></div>
         <div class="form-group"><label>작업내용</label><input type="text" id="m_schWork"></div>
-        <div class="form-group"><label>설비ID</label><input type="text" id="m_schEqId"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="m_schManager"></div>
         <div class="form-group"><label>발주번호</label><input type="text" id="m_schOrderNo"></div>
         <div class="form-group"><label>필수자재</label><input type="text" id="m_schMat"></div>
         <div class="form-group"><label>허가번호</label><input type="text" id="m_schPermit"></div>
         <div class="form-group"><label>비고</label><input type="text" id="m_schNote"></div>
+        <div class="form-group"><label>설비ID</label><input type="text" id="m_schEqId"></div>
       </div>
     </div>
     <div class="modal-footer"><button onclick="closeModal('scheduleModal')">취소</button><button onclick="saveScheduleFromModal()" class="btn-primary admin-only">수정 저장</button></div>
