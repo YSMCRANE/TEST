@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.3 (Checklist Upgraded)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.4 (Checklist Pro)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -114,7 +114,10 @@
     .status-badge.active-4 { background-color: #9C27B0 !important; color: #fff !important; } 
     .status-badge.permit-active { background-color: var(--primary-color) !important; color: #fff !important; } 
     .status-badge.done-active { background-color: var(--success-color) !important; color: #000 !important; } 
-    .status-badge.mat-active { background-color: var(--success-color) !important; color: #000 !important; } 
+    
+    /* 자재 관리용 뱃지 */
+    .status-badge.order-active { background-color: var(--warning-color) !important; color: #000 !important; } 
+    .status-badge.stock-active { background-color: var(--success-color) !important; color: #000 !important; } 
 
     .flex-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
     .paginator { margin-top: 15px; display: flex; justify-content: center; gap: 4px; }
@@ -183,21 +186,28 @@
     .od-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; padding-top: 10px; border-top: 1px dashed #444; }
     .od-actions { display: flex; gap: 8px; align-items: center; }
 
-    /* [NEW] 점검일지 카드 스타일 */
+    /* [NEW] 점검일지 카드 스타일 (업그레이드) */
     .cl-item-card { 
         background: #252525; border: 1px solid #444; border-radius: 12px; padding: 20px; 
-        margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; 
+        margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; 
     }
     .cl-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
     .cl-header-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .cl-team { color: var(--primary-color); font-weight: bold; font-size: 1.1em; }
     .cl-date { color: #aaa; font-size: 0.9em; }
+    /* 핵심: 점검내용 박스 스타일 */
     .cl-content-box { 
-        background: #333; padding: 15px; border-radius: 8px; color: #fff; 
-        white-space: pre-wrap; line-height: 1.6; font-size: 0.95em; border: 1px solid #444;
+        background: #2f2f2f; padding: 15px; border-radius: 4px; color: #fff; 
+        white-space: pre-wrap; line-height: 1.6; font-size: 1.05em; 
+        border: 1px solid #444; border-left: 5px solid var(--accent-color);
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
     }
-    .cl-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 0.9em; color: #ccc; }
-    .cl-mat { color: var(--warning-color); font-weight: bold; }
+    .cl-footer { 
+        display: flex; flex-direction: column; gap: 8px; margin-top: 5px; 
+        padding-top: 10px; border-top: 1px dashed #444; font-size: 0.9em; 
+    }
+    .cl-mat-row { display: flex; align-items: flex-start; gap: 8px; }
+    .cl-mat-label { font-weight: bold; min-width: 80px; text-align: right; }
 
     /* 모바일 반응형 */
     .mobile-overlay {
@@ -262,7 +272,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.3</span>
+      <span class="sub-text">통합 관리 시스템 v6.4</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -379,7 +389,10 @@
             <input type="text" id="clTeam" placeholder="생산팀">
             <input type="text" id="clEqId" placeholder="설비ID">
             <input type="text" id="clManager" placeholder="담당자">
-            <input type="text" id="clMat" placeholder="필요자재">
+          </div>
+          <div class="flex-row">
+             <input type="text" id="clMatOrder" placeholder="🛒 주문 필요 자재" style="border:1px solid var(--warning-color);">
+             <input type="text" id="clMatStock" placeholder="📦 보유 중 자재" style="border:1px solid var(--success-color);">
           </div>
           <div class="flex-row" style="margin-top:10px;">
              <input type="text" id="clContent" placeholder="점검내용 (간략히 입력 후 수정 추천)" style="flex-grow:1; width:100%;">
@@ -623,16 +636,18 @@
         <div class="form-group"><label>생산팀</label><input type="text" id="m_clTeam"></div>
         <div class="form-group"><label>설비ID</label><input type="text" id="m_clEqId"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="m_clManager"></div>
-        <div class="form-group"><label>필요자재</label><input type="text" id="m_clMat"></div>
+        <div class="form-group"><label style="color:var(--warning-color)">🛒 주문 필요 자재</label><input type="text" id="m_clMatOrder"></div>
+        <div class="form-group"><label style="color:var(--success-color)">📦 보유 중 자재</label><input type="text" id="m_clMatStock"></div>
       </div>
       <div class="form-group" style="margin-top:15px;">
         <label>점검내용 (상세)</label>
         <textarea id="m_clContent" rows="8" style="width:100%;"></textarea>
       </div>
       <div class="form-group" style="margin-top:15px;">
-          <label style="color:var(--primary-color); font-weight:bold;">자재 확인</label>
+          <label style="color:var(--primary-color); font-weight:bold;">상태 확인</label>
           <div class="checkbox-group">
-             <label><input type="checkbox" id="m_clChk"> 자재 준비 완료</label>
+             <label><input type="checkbox" id="m_clChkOrder"> 자재 주문 요청 완료</label>
+             <label><input type="checkbox" id="m_clChkStock"> 보유 자재 준비 완료</label>
           </div>
       </div>
     </div>
@@ -675,7 +690,7 @@
 
 <script>
   // [중요] 반드시 본인의 최신 Web App URL로 교체하세요!
-  const API_URL = "https://script.google.com/macros/s/AKfycby1BTN0vpz_PYOTd8_2UXBj2llTdiXQlL6tFxVFqAW3S14nhFKoDRgWm_xA5NWeS0Lp3g/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzMjpLQ5ThuX2gCHBAzMcF215kIrKTtMQsUdMWglXYhmiIR1bKgo9XMB_5gANql99Qguw/exec";
   
   /* --- [보안] 로그인 설정 --- */
   const PW_ADMIN = "1984"; // 관리자용 (수정/삭제 가능)
@@ -898,7 +913,7 @@
     scheduleChartInstance = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: '작업 건수', data, backgroundColor: 'rgba(74, 144, 226, 0.6)' }] }, options: { maintainAspectRatio:false, scales:{y:{beginAtZero:true}} } });
   });
 
-  /* ================= [신규] 2. 점검일지 (Checklist) - Card View 적용 ================= */
+  /* ================= [수정됨] 2. 점검일지 (Checklist) - Card View 적용 ================= */
   let clPage=1, pageSizeCl=10, clRowMap=new Map();
   
   async function loadChecklist(){ 
@@ -918,7 +933,7 @@
       const sortKey = document.getElementById('clSortSel').value; 
       const all = Array.from(clRowMap.entries()).map(([k,v]) => ({row:k, cells:v}));
       
-      const filtered = all.filter(it => (it.cells[2]||"").toLowerCase().includes(kw) || (it.cells[4]||"").toLowerCase().includes(kw) || (it.cells[5]||"").toLowerCase().includes(kw));
+      const filtered = all.filter(it => (it.cells[2]||"").toLowerCase().includes(kw) || (it.cells[4]||"").toLowerCase().includes(kw));
       
       filtered.sort((a,b) => {
           let va, vb;
@@ -941,8 +956,10 @@
       }
 
       filtered.slice(start,end).forEach(it => {
-          const r = it.cells; // r[0]:날짜, r[1]:팀, r[2]:설비ID, r[3]:담당자, r[4]:내용, r[5]:자재, r[6]:확인
-          const isMatChecked = normalizeBool(r[6]);
+          const r = it.cells; 
+          // r[5]:주문자재, r[6]:보유자재, r[7]:주문확인, r[8]:보유확인
+          const isOrderChecked = normalizeBool(r[7]);
+          const isStockChecked = normalizeBool(r[8]);
           
           let eqHtml = r[2] ? `<span class="link-text" onclick="goToEquipmentSpec('${r[2]}')">🔗 ${r[2]}</span>` : '-';
           
@@ -965,11 +982,17 @@
             </div>
             <div class="cl-content-box">${r[4]}</div>
             <div class="cl-footer">
-                <div>
-                    <span class="cl-mat">🧱 ${r[5] || '자재 없음'}</span>
+                <div class="cl-mat-row">
+                    <span class="cl-mat-label" style="color:var(--warning-color)">🛒 주문필요:</span>
+                    <span>${r[5] || '-'}</span>
                 </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                     <span class="status-badge ${isMatChecked?'mat-active':''}" onclick="toggleChecklistStatus(${it.row}, ${!isMatChecked})">자재확인</span>
+                <div class="cl-mat-row">
+                    <span class="cl-mat-label" style="color:var(--success-color)">📦 보유중:</span>
+                    <span>${r[6] || '-'}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                     <span class="status-badge ${isOrderChecked?'order-active':''}" onclick="toggleChecklistStatus(${it.row}, 'order', ${!isOrderChecked})">자재주문요청</span>
+                     <span class="status-badge ${isStockChecked?'stock-active':''}" onclick="toggleChecklistStatus(${it.row}, 'stock', ${!isStockChecked})">보유자재확인</span>
                      <button onclick='openChecklistModal(${it.row})' class="admin-only" style="padding:4px 8px;">✏️</button>
                      <button onclick='deleteChecklist(${it.row})' class="btn-danger admin-only" style="padding:4px 8px;">🗑️</button>
                 </div>
@@ -983,23 +1006,26 @@
   async function saveChecklist(){ 
       const date=document.getElementById('clDate').value, team=document.getElementById('clTeam').value; 
       const eqId=document.getElementById('clEqId').value, manager=document.getElementById('clManager').value;
-      const content=document.getElementById('clContent').value, mat=document.getElementById('clMat').value; 
+      const content=document.getElementById('clContent').value;
+      const matOrder=document.getElementById('clMatOrder').value, matStock=document.getElementById('clMatStock').value;
       
       if(!date || !content) { alert("날짜와 내용은 필수입니다."); return; } 
-      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_add", date, team, eqId, manager, content, material: mat})}); 
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_add", date, team, eqId, manager, content, matOrder, matStock})}); 
       
-      document.getElementById('clEqId').value=""; document.getElementById('clContent').value=""; document.getElementById('clMat').value="";
+      document.getElementById('clEqId').value=""; document.getElementById('clContent').value=""; 
+      document.getElementById('clMatOrder').value=""; document.getElementById('clMatStock').value="";
       loadChecklist(); 
   }
 
   async function deleteChecklist(row){ if(confirm("점검기록을 삭제하시겠습니까?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_delete",row})}); loadChecklist(); } }
   
-  async function toggleChecklistStatus(row, val){ 
+  async function toggleChecklistStatus(row, type, val){ 
       const old = clRowMap.get(row); 
       if(old){ 
-          old[6] = val ? "TRUE" : "FALSE"; 
+          if(type === 'order') old[7] = val ? "TRUE" : "FALSE";
+          else old[8] = val ? "TRUE" : "FALSE";
           renderChecklistCards(); 
-          await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_toggle", row, value: (val?"TRUE":"FALSE")})}); 
+          await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_toggle", row, type, value: (val?"TRUE":"FALSE")})}); 
       } 
   }
 
@@ -1010,19 +1036,23 @@
       document.getElementById('m_clTeam').value = old[1]; 
       document.getElementById('m_clEqId').value = old[2]; 
       document.getElementById('m_clManager').value = old[3]; 
-      document.getElementById('m_clContent').value = old[4]; // textarea에 값 넣기
-      document.getElementById('m_clMat').value = old[5]; 
-      document.getElementById('m_clChk').checked = normalizeBool(old[6]); 
+      document.getElementById('m_clContent').value = old[4];
+      document.getElementById('m_clMatOrder').value = old[5]; 
+      document.getElementById('m_clMatStock').value = old[6]; 
+      document.getElementById('m_clChkOrder').checked = normalizeBool(old[7]); 
+      document.getElementById('m_clChkStock').checked = normalizeBool(old[8]); 
       openModal('checklistModal'); 
   }
 
   async function saveChecklistFromModal(){ 
       const date=document.getElementById('m_clDate').value, team=document.getElementById('m_clTeam').value; 
       const eqId=document.getElementById('m_clEqId').value, manager=document.getElementById('m_clManager').value; 
-      const content=document.getElementById('m_clContent').value, mat=document.getElementById('m_clMat').value; 
-      const chk=document.getElementById('m_clChk').checked?"TRUE":"FALSE"; 
+      const content=document.getElementById('m_clContent').value;
+      const matOrder=document.getElementById('m_clMatOrder').value, matStock=document.getElementById('m_clMatStock').value;
+      const chkOrder=document.getElementById('m_clChkOrder').checked?"TRUE":"FALSE"; 
+      const chkStock=document.getElementById('m_clChkStock').checked?"TRUE":"FALSE"; 
       
-      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_update", row: currentClRow, date, team, eqId, manager, content, material: mat, chk})}); 
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_update", row: currentClRow, date, team, eqId, manager, content, matOrder, matStock, chkOrder, chkStock})}); 
       closeModal('checklistModal'); 
       loadChecklist(); 
   }
