@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.1 (Delivery)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.2 (Checklist)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -113,6 +113,7 @@
     .status-badge.active-4 { background-color: #9C27B0 !important; color: #fff !important; } 
     .status-badge.permit-active { background-color: var(--primary-color) !important; color: #fff !important; } 
     .status-badge.done-active { background-color: var(--success-color) !important; color: #000 !important; } 
+    .status-badge.mat-active { background-color: var(--success-color) !important; color: #000 !important; } /* 자재확인용 */
 
     .flex-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
     .paginator { margin-top: 15px; display: flex; justify-content: center; gap: 4px; }
@@ -244,12 +245,12 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.1</span>
+      <span class="sub-text">통합 관리 시스템 v6.2</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
       <a class="nav-item active" onclick="switchTab('schedule')"><span class="nav-icon">📅</span> 일정관리</a>
-      <a class="nav-item" onclick="switchTab('prework')"><span class="nav-icon">📝</span> 선작업 관리</a>
+      <a class="nav-item" onclick="switchTab('checklist')"><span class="nav-icon">📋</span> 점검일지</a> <a class="nav-item" onclick="switchTab('prework')"><span class="nav-icon">📝</span> 선작업 관리</a>
       <a class="nav-item" onclick="switchTab('delivery')"><span class="nav-icon">🚚</span> 납품관리</a>
       <a class="nav-item" onclick="switchTab('order')"><span class="nav-icon">📦</span> 발주정보</a>
       <div class="nav-group-label">기준 정보</div>
@@ -349,6 +350,42 @@
                 </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div id="checklist" class="tab-content">
+        <div class="card admin-only">
+          <h3>📋 점검일지 등록</h3>
+          <div class="flex-row">
+            <input type="date" id="clDate" required>
+            <input type="text" id="clTeam" placeholder="생산팀">
+            <input type="text" id="clEqId" placeholder="설비ID">
+            <input type="text" id="clManager" placeholder="담당자">
+            <input type="text" id="clContent" placeholder="점검내용" style="flex-grow:1">
+            <input type="text" id="clMat" placeholder="필요자재">
+            <button onclick="saveChecklist()" class="btn-primary">등록</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex-row" style="justify-content: flex-start;">
+            <input type="text" id="clSearch" placeholder="🔍 검색 (설비ID, 점검내용, 자재)" style="width: 250px;">
+            <select id="clSortSel">
+              <option value="날짜">날짜순</option>
+              <option value="생산팀">생산팀순</option>
+              <option value="설비ID">설비ID순</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table id="clTable">
+              <thead>
+                <tr>
+                  <th>날짜</th><th>생산팀</th><th>설비ID</th><th>담당자</th><th>점검내용</th><th>필요자재</th><th style="text-align:center;">자재확인</th><th>관리</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="clPagination" class="paginator"></div>
         </div>
       </div>
 
@@ -564,6 +601,29 @@
   </div>
 </div>
 
+<div id="checklistModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3>📋 점검일지 수정</h3><span class="close-modal" onclick="closeModal('checklistModal')">&times;</span></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>날짜</label><input type="date" id="m_clDate"></div>
+        <div class="form-group"><label>생산팀</label><input type="text" id="m_clTeam"></div>
+        <div class="form-group"><label>설비ID</label><input type="text" id="m_clEqId"></div>
+        <div class="form-group"><label>담당자</label><input type="text" id="m_clManager"></div>
+        <div class="form-group"><label>점검내용</label><input type="text" id="m_clContent"></div>
+        <div class="form-group"><label>필요자재</label><input type="text" id="m_clMat"></div>
+        <div class="form-group">
+          <label style="color:var(--primary-color); font-weight:bold;">자재 확인</label>
+          <div class="checkbox-group">
+             <label><input type="checkbox" id="m_clChk"> 자재 준비 완료</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button onclick="closeModal('checklistModal')">취소</button><button onclick="saveChecklistFromModal()" class="btn-primary admin-only">수정 저장</button></div>
+  </div>
+</div>
+
 <div id="preworkModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>📝 선작업 수정</h3><span class="close-modal" onclick="closeModal('preworkModal')">&times;</span></div><div class="modal-body"><div class="form-grid"><div class="form-group"><label>날짜</label><input type="date" id="m_pwDate"></div><div class="form-group"><label>생산팀</label><input type="text" id="m_pwTeam"></div><div class="form-group"><label>담당자</label><input type="text" id="m_pwManager"></div><div class="form-group"><label>공사명</label><input type="text" id="m_pwProject"></div><div class="form-group"><label>작업내용</label><input type="text" id="m_pwWork"></div><div class="form-group"><label style="color:var(--primary-color); font-weight:bold;">상태 체크</label><div class="checkbox-group" style="flex-wrap:wrap"><label><input type="checkbox" id="m_pwChk1"> 작업완료</label><label><input type="checkbox" id="m_pwChk2"> 내용전달</label><label><input type="checkbox" id="m_pwChk3"> 입찰완료</label><label><input type="checkbox" id="m_pwChk4"> 발주완료</label></div></div></div></div><div class="modal-footer"><button onclick="closeModal('preworkModal')">취소</button><button onclick="savePreworkFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 
 <div id="deliveryModal" class="modal">
@@ -599,7 +659,7 @@
 
 <script>
   // [중요] 반드시 본인의 최신 Web App URL로 교체하세요!
-  const API_URL = "https://script.google.com/macros/s/AKfycbzmfoImopW4qx0Pdi2sz5-Jj-TN5BK0y4o1tI2JpNlTwOvd7ZIbxDR1fik022sTlS1SVg/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycby1BTN0vpz_PYOTd8_2UXBj2llTdiXQlL6tFxVFqAW3S14nhFKoDRgWm_xA5NWeS0Lp3g/exec";
   
   /* --- [보안] 로그인 설정 --- */
   const PW_ADMIN = "1984"; // 관리자용 (수정/삭제 가능)
@@ -637,11 +697,11 @@
       document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active')); 
       document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active')); 
       document.getElementById(tabId).classList.add('active'); 
-      const idx = ['schedule','prework','delivery','order','equipment','bucket','phonebook'].indexOf(tabId); 
+      const idx = ['schedule','checklist','prework','delivery','order','equipment','bucket','phonebook'].indexOf(tabId); // checklist 추가
       const navItems = document.querySelectorAll('.nav-item');
       if(idx>=0 && navItems[idx]) navItems[idx].classList.add('active'); 
       if(window.innerWidth <= 768) { toggleSidebar(); }
-      const titles = {'schedule':'📅 일정관리', 'prework':'📝 선작업 관리', 'delivery':'🚚 납품관리', 'order':'📦 발주정보', 'equipment':'📄 설비관리', 'bucket':'🪣 버켓주기', 'phonebook':'📞 전화번호부'};
+      const titles = {'schedule':'📅 일정관리', 'checklist':'📋 점검일지', 'prework':'📝 선작업 관리', 'delivery':'🚚 납품관리', 'order':'📦 발주정보', 'equipment':'📄 설비관리', 'bucket':'🪣 버켓주기', 'phonebook':'📞 전화번호부'};
       document.getElementById('pageTitle').textContent = titles[tabId];
   }
 
@@ -649,7 +709,7 @@
   function renderPaginator(divId, totalPages, callback, currentPage){ const div = document.getElementById(divId); div.innerHTML = ""; if(totalPages < 2) return; let startP = Math.max(1, currentPage - 2); let endP = Math.min(totalPages, startP + 4); for(let i=startP; i<=endP; i++){ const b = document.createElement("button"); b.textContent = i; if(i === currentPage) b.classList.add("active"); b.onclick = () => callback(i); div.appendChild(b); } }
   function openModal(id) { document.getElementById(id).classList.add('show'); }
   function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-  let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null, currentDlRow=null;
+  let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null, currentDlRow=null, currentClRow=null; // currentClRow 추가
   function normalizeBool(val) { if (val === true || val === false) return val; if (!val) return false; const str = String(val).trim().toUpperCase(); return str === 'TRUE' || str === '허가' || str === '완료'; }
 
   /* ================= 1. 일정관리 ================= */
@@ -822,7 +882,108 @@
     scheduleChartInstance = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: '작업 건수', data, backgroundColor: 'rgba(74, 144, 226, 0.6)' }] }, options: { maintainAspectRatio:false, scales:{y:{beginAtZero:true}} } });
   });
 
-  /* ================= 2. 선작업 관리 ================= */
+  /* ================= [신규] 2. 점검일지 (Checklist) ================= */
+  let clPage=1, pageSizeCl=10, clRowMap=new Map();
+  
+  async function loadChecklist(){ 
+    try { 
+        const res = await fetch(API_URL+"?action=checklist_get"); 
+        const rows = await res.json(); 
+        if(!rows || rows.length === 0) return;
+        clRowMap.clear(); 
+        const all = rows.slice(1).map((r,i)=>({row:i+2, cells:r})); 
+        all.forEach(it=>clRowMap.set(it.row, it.cells)); 
+        renderChecklistTable(); 
+    } catch(e) { console.error(e); } 
+  }
+
+  function renderChecklistTable(){
+      const kw = (document.getElementById('clSearch').value||"").toLowerCase();
+      const sortKey = document.getElementById('clSortSel').value; 
+      const all = Array.from(clRowMap.entries()).map(([k,v]) => ({row:k, cells:v}));
+      const filtered = all.filter(it => (it.cells[2]||"").toLowerCase().includes(kw) || (it.cells[4]||"").toLowerCase().includes(kw) || (it.cells[5]||"").toLowerCase().includes(kw));
+      
+      filtered.sort((a,b) => {
+          let va, vb;
+          if (sortKey === "날짜") { return new Date(b.cells[0]) - new Date(a.cells[0]); 
+          } else if (sortKey === "생산팀") { va = a.cells[1] || ""; vb = b.cells[1] || ""; return va.localeCompare(vb);
+          } else if (sortKey === "설비ID") { va = a.cells[2] || ""; vb = b.cells[2] || ""; return va.localeCompare(vb); }
+          return 0;
+      });
+
+      const totalPages = Math.ceil(filtered.length/pageSizeCl)||1; if(clPage > totalPages) clPage = 1;
+      const start = (clPage-1)*pageSizeCl, end = start+pageSizeCl;
+      const tb = document.querySelector("#clTable tbody"); tb.innerHTML = "";
+      
+      filtered.slice(start,end).forEach(it => {
+          const r = it.cells;
+          const isMatChecked = normalizeBool(r[6]);
+          const tr = document.createElement("tr");
+          // r[0]:날짜, r[1]:팀, r[2]:설비ID, r[3]:담당자, r[4]:내용, r[5]:자재, r[6]:확인
+          let eqHtml = r[2] ? `<span class="link-text" onclick="goToEquipmentSpec('${r[2]}')">🔗 ${r[2]}</span>` : '-';
+
+          tr.innerHTML = `<td>${formatDate(r[0])}</td><td>${r[1]}</td><td>${eqHtml}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]||'-'}</td>
+              <td style="text-align:center;">
+                <span class="status-badge ${isMatChecked?'mat-active':''}" onclick="toggleChecklistStatus(${it.row}, ${!isMatChecked})">자재확인</span>
+              </td>
+              <td><button onclick='openChecklistModal(${it.row})' class="admin-only">✏️</button> <button onclick='deleteChecklist(${it.row})' class="btn-danger admin-only">🗑️</button></td>`;
+          tb.appendChild(tr);
+      }); 
+      renderPaginator("clPagination", totalPages, (p)=>{clPage=p; renderChecklistTable();}, clPage);
+  }
+
+  async function saveChecklist(){ 
+      const date=document.getElementById('clDate').value, team=document.getElementById('clTeam').value; 
+      const eqId=document.getElementById('clEqId').value, manager=document.getElementById('clManager').value;
+      const content=document.getElementById('clContent').value, mat=document.getElementById('clMat').value; 
+      
+      if(!date || !content) { alert("날짜와 내용은 필수입니다."); return; } 
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_add", date, team, eqId, manager, content, material: mat})}); 
+      
+      document.getElementById('clEqId').value=""; document.getElementById('clContent').value=""; document.getElementById('clMat').value="";
+      loadChecklist(); 
+  }
+
+  async function deleteChecklist(row){ if(confirm("점검기록을 삭제하시겠습니까?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_delete",row})}); loadChecklist(); } }
+  
+  async function toggleChecklistStatus(row, val){ 
+      const old = clRowMap.get(row); 
+      if(old){ 
+          old[6] = val ? "TRUE" : "FALSE"; 
+          renderChecklistTable(); 
+          await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_toggle", row, value: (val?"TRUE":"FALSE")})}); 
+      } 
+  }
+
+  function openChecklistModal(row){ 
+      currentClRow = row; 
+      const old = clRowMap.get(row); 
+      document.getElementById('m_clDate').value = formatDate(old[0]); 
+      document.getElementById('m_clTeam').value = old[1]; 
+      document.getElementById('m_clEqId').value = old[2]; 
+      document.getElementById('m_clManager').value = old[3]; 
+      document.getElementById('m_clContent').value = old[4]; 
+      document.getElementById('m_clMat').value = old[5]; 
+      document.getElementById('m_clChk').checked = normalizeBool(old[6]); 
+      openModal('checklistModal'); 
+  }
+
+  async function saveChecklistFromModal(){ 
+      const date=document.getElementById('m_clDate').value, team=document.getElementById('m_clTeam').value; 
+      const eqId=document.getElementById('m_clEqId').value, manager=document.getElementById('m_clManager').value; 
+      const content=document.getElementById('m_clContent').value, mat=document.getElementById('m_clMat').value; 
+      const chk=document.getElementById('m_clChk').checked?"TRUE":"FALSE"; 
+      
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"checklist_update", row: currentClRow, date, team, eqId, manager, content, material: mat, chk})}); 
+      closeModal('checklistModal'); 
+      loadChecklist(); 
+  }
+
+  document.getElementById("clSearch").addEventListener("input", ()=>{clPage=1; renderChecklistTable();});
+  document.getElementById("clSortSel").addEventListener("change", ()=>{ clPage=1; renderChecklistTable(); });
+
+
+  /* ================= 3. 선작업 관리 ================= */
   let pwPage=1, pageSizePw=10, pwRowMap=new Map();
   async function loadPrework(){ 
     try { 
@@ -883,7 +1044,7 @@
   document.getElementById("pwSearch").addEventListener("input", ()=>{pwPage=1; renderPreworkTable();});
   document.getElementById("pwSortSel").addEventListener("change", ()=>{ pwPage=1; renderPreworkTable(); });
 
-  /* ================= [신규] 3. 납품관리 (Delivery) ================= */
+  /* ================= 4. 납품관리 (Delivery) ================= */
   let dlPage=1, pageSizeDl=10, dlRowMap=new Map();
   async function loadDelivery(){ 
     try { 
@@ -944,7 +1105,7 @@
   document.getElementById("dlSearch").addEventListener("input", ()=>{dlPage=1; renderDeliveryTable();});
   document.getElementById("dlSortSel").addEventListener("change", ()=>{ dlPage=1; renderDeliveryTable(); });
 
-  /* ================= 4. 발주정보 ================= */
+  /* ================= 5. 발주정보 ================= */
   let odPage=1, pageSizeOrder=10, odRowMap=new Map(), odSortAsc=false;
   async function fetchOrderData() { try { const res = await fetch(API_URL+"?action=order_get"); const rows = await res.json(); odRowMap.clear(); const all = rows.slice(1).map((r,i)=>({row:i+2, cells:r})); all.forEach(it=>odRowMap.set(it.row, it.cells)); loadOrder(); } catch(e) { console.error(e); } }
   function loadOrder() { 
@@ -1053,7 +1214,8 @@
   async function deleteEquipmentSpec(row){ if(confirm("삭제?")) { await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"spec_delete",row})}); loadEquipmentSpec(); } }
 
   /* 초기화 */
-  toggleScheduleView('calendar'); loadSchedule(true); loadPhonebook(); loadBucket(); fetchOrderData(); loadEquipmentSpec(); loadPrework(); loadDelivery(); // [신규] 납품관리 로드 추가
+  toggleScheduleView('calendar'); loadSchedule(true); loadPhonebook(); loadBucket(); fetchOrderData(); loadEquipmentSpec(); loadPrework(); loadDelivery(); 
+  loadChecklist(); // [신규] 점검일지 로드
 </script>
 </body>
 </html>
