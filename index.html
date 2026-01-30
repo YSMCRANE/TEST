@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.9.1 (Bucket Pro)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.9.2 (Bucket Pro)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -303,7 +303,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.9.1</span>
+      <span class="sub-text">통합 관리 시스템 v6.9.2</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -701,12 +701,12 @@
 <div id="phoneModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>📞 연락처 수정</h3><span class="close-modal" onclick="closeModal('phoneModal')">&times;</span></div><div class="modal-body"><div class="form-grid" style="grid-template-columns: 1fr;"><div class="form-group"><label>부서</label><input type="text" id="m_pbDept"></div><div class="form-group"><label>직책</label><input type="text" id="m_pbPos"></div><div class="form-group"><label>이름</label><input type="text" id="m_pbName"></div><div class="form-group"><label>전화번호</label><input type="text" id="m_pbPhone"></div></div></div><div class="modal-footer"><button onclick="closeModal('phoneModal')">취소</button><button onclick="savePhoneFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 
 <div id="addBucketEntryModal" class="modal">
-  <div class="modal-content" style="max-width:400px;">
+  <div class="modal-content" style="width: 500px; max-width: 90%; height: auto;">
     <div class="modal-header">
         <h3 id="addBucketTitle">🪣 교체 기록 등록</h3>
         <span class="close-modal" onclick="closeModal('addBucketEntryModal')">&times;</span>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="overflow: visible;">
         <input type="hidden" id="n_bkDept"> <div class="form-group" style="margin-bottom:15px;">
             <label>교체 날짜</label>
             <input type="date" id="n_bkDate" style="width:100%;">
