@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.9 (Structured Bucket)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.9.1 (Bucket Pro)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -120,8 +120,8 @@
         display: flex; flex-direction: column; transition: transform 0.2s; position: relative;
     }
     .bk-card:hover { transform: translateY(-3px); border-color: var(--primary-color); }
-    .bk-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-    .bk-dept { font-size: 1.2em; font-weight: bold; color: #fff; }
+    .bk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom:10px; border-bottom:1px solid #444; }
+    .bk-dept { font-size: 1.1em; font-weight: bold; color: #fff; }
     .bk-latest-date { font-size: 0.9em; color: #aaa; }
     .bk-elapsed-box { 
         background: #222; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; 
@@ -303,7 +303,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.9</span>
+      <span class="sub-text">통합 관리 시스템 v6.9.1</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -565,15 +565,6 @@
       </div>
 
       <div id="bucket" class="tab-content">
-        <div class="card admin-only">
-          <h3>버켓 교체 기록</h3>
-          <div class="flex-row">
-            <input type="text" id="bkDept" placeholder="부서/호기 (예: 저광사 서쪽)">
-            <input type="date" id="bkDate">
-            <input type="text" id="bkNote" placeholder="비고">
-            <button onclick="saveBucket()" class="btn-primary">저장</button>
-          </div>
-        </div>
         <div class="card">
           <div id="bkFilterContainer" class="bk-filter-container">
               </div>
@@ -708,7 +699,30 @@
 <div id="orderModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>📦 발주 정보 수정</h3><span class="close-modal" onclick="closeModal('orderModal')">&times;</span></div><div class="modal-body"><div class="form-grid"><div class="form-group"><label>입찰번호</label><input type="text" id="m_odBid"></div><div class="form-group"><label>의뢰번호</label><input type="text" id="m_odReq"></div><div class="form-group"><label>구매PO번호</label><input type="text" id="m_odPo"></div><div class="form-group"><label>의뢰자</label><input type="text" id="m_odRequester"></div><div class="form-group"><label>구매담당자</label><input type="text" id="m_odBuyer"></div><div class="form-group"><label>공사명</label><input type="text" id="m_odProject"></div><div class="form-group"><label>작업내용</label><input type="text" id="m_odPermit"></div><div class="form-group"><label>필수자재</label><input type="text" id="m_odMat"></div><div class="form-group"><label>허가번호</label><input type="text" id="m_odPermitNo"></div><div class="form-group"><label style="color:var(--primary-color); font-weight:bold;">진행 상태 체크</label><div class="checkbox-group"><label><input type="checkbox" id="m_odPermitCheck"> 허가발행</label><label><input type="checkbox" id="m_odDoneCheck"> 작업완료</label></div></div></div></div><div class="modal-footer"><button onclick="closeModal('orderModal')">취소</button><button onclick="saveOrderFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 
 <div id="phoneModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>📞 연락처 수정</h3><span class="close-modal" onclick="closeModal('phoneModal')">&times;</span></div><div class="modal-body"><div class="form-grid" style="grid-template-columns: 1fr;"><div class="form-group"><label>부서</label><input type="text" id="m_pbDept"></div><div class="form-group"><label>직책</label><input type="text" id="m_pbPos"></div><div class="form-group"><label>이름</label><input type="text" id="m_pbName"></div><div class="form-group"><label>전화번호</label><input type="text" id="m_pbPhone"></div></div></div><div class="modal-footer"><button onclick="closeModal('phoneModal')">취소</button><button onclick="savePhoneFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
-<div id="bucketModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>🪣 버켓 기록 수정</h3><span class="close-modal" onclick="closeModal('bucketModal')">&times;</span></div><div class="modal-body"><div class="form-grid" style="grid-template-columns: 1fr;"><div class="form-group"><label>부서/호기</label><input type="text" id="m_bkDept"></div><div class="form-group"><label>날짜</label><input type="date" id="m_bkDate"></div><div class="form-group"><label>비고</label><input type="text" id="m_bkNote"></div></div></div><div class="modal-footer"><button onclick="closeModal('bucketModal')">취소</button><button onclick="saveBucketFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
+
+<div id="addBucketEntryModal" class="modal">
+  <div class="modal-content" style="max-width:400px;">
+    <div class="modal-header">
+        <h3 id="addBucketTitle">🪣 교체 기록 등록</h3>
+        <span class="close-modal" onclick="closeModal('addBucketEntryModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" id="n_bkDept"> <div class="form-group" style="margin-bottom:15px;">
+            <label>교체 날짜</label>
+            <input type="date" id="n_bkDate" style="width:100%;">
+        </div>
+        <div class="form-group">
+            <label>비고</label>
+            <input type="text" id="n_bkNote" placeholder="내용 입력" style="width:100%;">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button onclick="closeModal('addBucketEntryModal')">취소</button>
+        <button onclick="submitBucketEntry()" class="btn-primary admin-only">저장</button>
+    </div>
+  </div>
+</div>
+
 <div id="specModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>🔧 설비 상세 스펙 편집</h3><span class="close-modal" onclick="closeModal('specModal')">&times;</span></div><div class="modal-body"><div id="modalMetaInfo" style="margin-bottom:15px; color:var(--primary-color); font-weight:bold;"></div><div id="specBasicInfo" class="form-grid" style="margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:15px;"><div class="form-group"><label>팀</label><input type="text" id="m_esTeam_modal"></div><div class="form-group"><label>설비ID</label><input type="text" id="m_esEqId_modal"></div><div class="form-group"><label>위치</label><input type="text" id="m_esLocation_modal"></div></div><table class="spec-table" id="modalSpecTable" style="width:100%; margin-bottom:15px; border-collapse:collapse;"><thead><tr><th style="width:40%">항목명 (Key)</th><th style="width:40%">값 (Value)</th><th style="width:20%">삭제</th></tr></thead><tbody></tbody></table><button onclick="addModalRow()" style="width:100%; border:1px dashed #555;" class="admin-only">+ 항목 추가</button></div><div class="modal-footer"><button onclick="closeModal('specModal')">취소</button><button onclick="saveSpecFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 
 <script>
@@ -1104,12 +1118,11 @@
   /* [NEW] 버켓주기 (Structured Dashboard) */
   let bkRowMap = new Map();
   let bkAllData = [];
-  let bkSelectedTeam = "제련1팀"; // 기본 선택
+  let bkSelectedTeam = "제련1팀"; 
 
-  // [핵심] 분류 고정 구조
   const TEAM_STRUCTURE = {
-      "제련1팀": ["저광사 서쪽", "저광사 동쪽", "SF1 PIT"],
-      "제련2팀": ["저광사 남쪽", "저광사 북쪽", "SF2 PIT"],
+      "제련1팀": ["저광사 서쪽", "저광사 동쪽", "SF1 PIT", "SF1 COLD PIT"],
+      "제련2팀": ["저광사 남쪽", "저광사 북쪽", "SF2 PIT", "SF2 COLD PIT"],
       "제련3팀": ["TSL1 PIT", "TSL2 PIT"],
       "OF2팀": ["OF2 PIT", "OF4 PIT"],
       "동순환자원팀": ["동순환자원 PIT"]
@@ -1120,7 +1133,6 @@
       const rows = await res.json(); 
       if(!rows || rows.length === 0) return;
       bkRowMap.clear(); 
-      // r[0]:부서/호기, r[1]:날짜, r[2]:비고
       bkAllData = rows.slice(1).map((r,i)=>({row:i+2, cells:r})); 
       bkAllData.forEach(it=>bkRowMap.set(it.row,it.cells)); 
       
@@ -1131,7 +1143,6 @@
   function renderBucketFilters() {
       const container = document.getElementById("bkFilterContainer");
       container.innerHTML = "";
-      // 고정된 팀 구조 순서대로 버튼 생성
       Object.keys(TEAM_STRUCTURE).forEach(team => {
           const isActive = bkSelectedTeam === team ? 'active' : '';
           container.innerHTML += `<button class="bk-filter-btn ${isActive}" onclick="setBucketFilter('${team}')">${team}</button>`;
@@ -1151,22 +1162,17 @@
       const targetLocations = TEAM_STRUCTURE[bkSelectedTeam] || [];
 
       targetLocations.forEach(locName => {
-          // 해당 설비 이름이 포함된 데이터 찾기
           const matched = bkAllData.filter(it => (it.cells[0]||"").includes(locName));
-          
-          // 최신순 정렬
           matched.sort((a,b) => new Date(b.cells[1]) - new Date(a.cells[1]));
           
           const latest = matched.length > 0 ? matched[0] : null;
           const latestDateStr = latest ? latest.cells[1] : "";
           const elapsed = latest ? getElapsedDays(latestDateStr) : 0;
           
-          // 색상 로직
           let elapsedClass = "bk-elapsed-val"; 
           if(elapsed > 180) elapsedClass += " danger"; 
           else if(elapsed > 90) elapsedClass += " warn";
 
-          // 카드 HTML 생성
           const card = document.createElement("div");
           card.className = "bk-card";
           
@@ -1186,6 +1192,9 @@
           card.innerHTML = `
               <div class="bk-header">
                   <div class="bk-dept">${locName}</div>
+                  <div style="display:flex; gap:5px;">
+                      <button onclick="openAddBucketModal('${locName}')" class="btn-primary admin-only" style="padding:2px 8px; font-size:0.8em;">+ 등록</button>
+                  </div>
               </div>
               <div class="bk-latest-date">최근 교체: ${latest ? formatDate(latestDateStr) : "-"}</div>
               <div class="bk-elapsed-box">
@@ -1221,7 +1230,29 @@
       }
   }
 
-  async function saveBucket(){ const dept=document.getElementById('bkDept').value, date=document.getElementById('bkDate').value, note=document.getElementById('bkNote').value; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"bucket_add",dept,date,note})}); document.getElementById('bkDept').value=""; document.getElementById('bkDate').value=""; document.getElementById('bkNote').value=""; loadBucket(); }
+  /* [NEW] 버켓 등록 팝업 관련 함수 */
+  function openAddBucketModal(deptName) {
+      document.getElementById('n_bkDept').value = deptName;
+      document.getElementById('addBucketTitle').innerText = `🪣 ${deptName} 교체 등록`;
+      document.getElementById('n_bkDate').value = getTodayStr(); // 오늘 날짜 기본
+      document.getElementById('n_bkNote').value = "";
+      openModal('addBucketEntryModal');
+  }
+
+  async function submitBucketEntry() {
+      const dept = document.getElementById('n_bkDept').value;
+      const date = document.getElementById('n_bkDate').value;
+      const note = document.getElementById('n_bkNote').value;
+      
+      if(!dept || !date) { alert("날짜를 선택해주세요."); return; }
+
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"bucket_add", dept, date, note})});
+      
+      closeModal('addBucketEntryModal');
+      loadBucket(); // 목록 새로고침
+  }
+
+  // 삭제 함수 (기존 유지)
   async function deleteBucket(row){ if(confirm("삭제?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"bucket_delete",row})}); loadBucket(); } }
   
   let esPage=1, pageSizeSpec=5, esRowMap=new Map(), esAllData = []; const defaultSpecs = ["크레인 종류", "양정", "정격 속도", "모터", "감속기", "레일", "와이어로프"];
