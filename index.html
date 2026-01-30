@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.6</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.6.1 (Bug Fixed)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -270,7 +270,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.6</span>
+      <span class="sub-text">통합 관리 시스템 v6.6.1</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -450,7 +450,8 @@
             <h3>🚚 납품 정보 등록</h3>
             <div class="flex-row">
                 <input type="date" id="dlDate" required>
-                <input type="text" id="dlOrderNo" placeholder="발주번호"> <input type="text" id="dlTeam" placeholder="생산팀">
+                <input type="text" id="dlOrderNo" placeholder="발주번호">
+                <input type="text" id="dlTeam" placeholder="생산팀">
                 <input type="text" id="dlManager" placeholder="담당자">
                 <input type="text" id="dlProject" placeholder="공사명">
                 <input type="text" id="dlContent" placeholder="납품내용">
@@ -652,8 +653,7 @@
   </div>
 </div>
 
-<div id="preworkModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>📝 선작업 수정</h3><span class="close-modal" onclick="closeModal('preworkModal')">&times;</span></div><div class="modal-body"><div class="form-grid"><div class="form-group"><label>날짜</label><input type="date" id="m_pwDate"></div><div class="form-group"><label>생산팀</label><input type="text" id="m_pwTeam"></div><div class="form-group"><label>담당자</label><input type="text" id="m_pwManager"></div>
-<div class="form-group"><label>작업내용</label><input type="text" id="m_pwWork"></div><div class="form-group"><label style="color:var(--primary-color); font-weight:bold;">상태 체크</label><div class="checkbox-group" style="flex-wrap:wrap"><label><input type="checkbox" id="m_pwChk1"> 작업완료</label><label><input type="checkbox" id="m_pwChk2"> 내용전달</label><label><input type="checkbox" id="m_pwChk3"> 입찰완료</label><label><input type="checkbox" id="m_pwChk4"> 발주완료</label></div></div></div></div><div class="modal-footer"><button onclick="closeModal('preworkModal')">취소</button><button onclick="savePreworkFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
+<div id="preworkModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>📝 선작업 수정</h3><span class="close-modal" onclick="closeModal('preworkModal')">&times;</span></div><div class="modal-body"><div class="form-grid"><div class="form-group"><label>날짜</label><input type="date" id="m_pwDate"></div><div class="form-group"><label>생산팀</label><input type="text" id="m_pwTeam"></div><div class="form-group"><label>담당자</label><input type="text" id="m_pwManager"></div><div class="form-group"><label>작업내용</label><input type="text" id="m_pwWork"></div><div class="form-group"><label style="color:var(--primary-color); font-weight:bold;">상태 체크</label><div class="checkbox-group" style="flex-wrap:wrap"><label><input type="checkbox" id="m_pwChk1"> 작업완료</label><label><input type="checkbox" id="m_pwChk2"> 내용전달</label><label><input type="checkbox" id="m_pwChk3"> 입찰완료</label><label><input type="checkbox" id="m_pwChk4"> 발주완료</label></div></div></div></div><div class="modal-footer"><button onclick="closeModal('preworkModal')">취소</button><button onclick="savePreworkFromModal()" class="btn-primary admin-only">수정 저장</button></div></div></div>
 
 <div id="deliveryModal" class="modal">
   <div class="modal-content">
@@ -661,7 +661,8 @@
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group"><label>발주날짜</label><input type="date" id="m_dlDate"></div>
-        <div class="form-group"><label>발주번호</label><input type="text" id="m_dlOrderNo"></div> <div class="form-group"><label>생산팀</label><input type="text" id="m_dlTeam"></div>
+        <div class="form-group"><label>발주번호</label><input type="text" id="m_dlOrderNo"></div>
+        <div class="form-group"><label>생산팀</label><input type="text" id="m_dlTeam"></div>
         <div class="form-group"><label>담당자</label><input type="text" id="m_dlManager"></div>
         <div class="form-group"><label>공사명</label><input type="text" id="m_dlProject"></div>
         <div class="form-group"><label>납품내용</label><input type="text" id="m_dlContent"></div>
@@ -1058,7 +1059,7 @@
   document.getElementById("clSortSel").addEventListener("change", ()=>{ clPage=1; renderChecklistCards(); });
 
 
-  /* ================= 3. 선작업 관리 (수정됨: 공사명 제거) ================= */
+  /* ================= [수정완료] 3. 선작업 관리 (JS 오류 수정) ================= */
   let pwPage=1, pageSizePw=10, pwRowMap=new Map();
   async function loadPrework(){ 
     try { 
@@ -1075,7 +1076,7 @@
       const kw = (document.getElementById('pwSearch').value||"").toLowerCase();
       const sortKey = document.getElementById('pwSortSel').value; 
       const all = Array.from(pwRowMap.entries()).map(([k,v]) => ({row:k, cells:v}));
-      const filtered = all.filter(it => (it.cells[3]||"").toLowerCase().includes(kw)); // 공사명(3) 빠짐 -> 작업내용이 index 3이 됨
+      const filtered = all.filter(it => (it.cells[3]||"").toLowerCase().includes(kw)); 
       filtered.sort((a,b) => {
           let va, vb;
           if (sortKey === "날짜") { return new Date(b.cells[0]) - new Date(a.cells[0]); 
@@ -1114,12 +1115,31 @@
   }
   async function deletePrework(row){ if(confirm("삭제?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"prework_delete",row})}); loadPrework(); } }
   async function togglePreworkStatus(row, type, val){ const old = pwRowMap.get(row); if(old){ const idxMap = {'chk1':4, 'chk2':5, 'chk3':6, 'chk4':7}; old[idxMap[type]] = val ? "TRUE" : "FALSE"; renderPreworkTable(); await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"prework_toggle", row, type, value: (val?"TRUE":"FALSE")})}); } }
-  function openPreworkModal(row){ currentPwRow = row; const old = pwRowMap.get(row); document.getElementById('m_pwDate').value = formatDate(old[0]); document.getElementById('m_pwTeam').value = old[1]; document.getElementById('m_pwManager').value = old[2]; document.getElementById('m_pwWork').value = old[3]; document.getElementById('m_pwChk1').checked = normalizeBool(old[4]); document.getElementById('m_pwChk2').checked = normalizeBool(old[5]); document.getElementById('m_pwChk3').checked = normalizeBool(old[6]); document.getElementById('m_pwChk4').checked = normalizeBool(old[7]); openModal('preworkModal'); }
-  async function savePreworkFromModal(){ const date=document.getElementById('m_pwDate').value, team=document.getElementById('m_pwTeam').value; const manager=document.getElementById('m_pwManager').value, work=document.getElementById('m_pwWork').value; const chk1=document.getElementById('m_pwChk1').checked?"TRUE":"FALSE", chk2=document.getElementById('m_pwChk2').checked?"TRUE":"FALSE"; const chk3=document.getElementById('m_pwChk3').checked?"TRUE":"FALSE", chk4=document.getElementById('m_pwChk4').checked?"TRUE":"FALSE"; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"prework_update", row: currentPwRow, date, team, manager, work, chk1, chk2, chk3, chk4})}); closeModal('preworkModal'); loadPrework(); }
+  function openPreworkModal(row){ 
+      currentPwRow = row; 
+      const old = pwRowMap.get(row); 
+      document.getElementById('m_pwDate').value = formatDate(old[0]); 
+      document.getElementById('m_pwTeam').value = old[1]; 
+      document.getElementById('m_pwManager').value = old[2]; 
+      document.getElementById('m_pwWork').value = old[3]; // 작업내용
+      document.getElementById('m_pwChk1').checked = normalizeBool(old[4]); 
+      document.getElementById('m_pwChk2').checked = normalizeBool(old[5]); 
+      document.getElementById('m_pwChk3').checked = normalizeBool(old[6]); 
+      document.getElementById('m_pwChk4').checked = normalizeBool(old[7]); 
+      openModal('preworkModal'); 
+  }
+  async function savePreworkFromModal(){ 
+      const date=document.getElementById('m_pwDate').value, team=document.getElementById('m_pwTeam').value; 
+      const manager=document.getElementById('m_pwManager').value, work=document.getElementById('m_pwWork').value; 
+      const chk1=document.getElementById('m_pwChk1').checked?"TRUE":"FALSE", chk2=document.getElementById('m_pwChk2').checked?"TRUE":"FALSE"; 
+      const chk3=document.getElementById('m_pwChk3').checked?"TRUE":"FALSE", chk4=document.getElementById('m_pwChk4').checked?"TRUE":"FALSE"; 
+      await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"prework_update", row: currentPwRow, date, team, manager, work, chk1, chk2, chk3, chk4})}); 
+      closeModal('preworkModal'); loadPrework(); 
+  }
   document.getElementById("pwSearch").addEventListener("input", ()=>{pwPage=1; renderPreworkTable();});
   document.getElementById("pwSortSel").addEventListener("change", ()=>{ pwPage=1; renderPreworkTable(); });
 
-  /* ================= 4. 납품관리 (수정됨: 발주번호 추가) ================= */
+  /* ================= 4. 납품관리 (수정완료: 발주번호 추가) ================= */
   let dlPage=1, pageSizeDl=10, dlRowMap=new Map();
   async function loadDelivery(){ 
     try { 
@@ -1136,7 +1156,7 @@
       const kw = (document.getElementById('dlSearch').value||"").toLowerCase();
       const sortKey = document.getElementById('dlSortSel').value; 
       const all = Array.from(dlRowMap.entries()).map(([k,v]) => ({row:k, cells:v}));
-      // r[4](공사명), r[5](납품내용) 검색 (인덱스 밀림 주의)
+      // r[4](공사명), r[5](납품내용) 검색
       const filtered = all.filter(it => (it.cells[4]||"").toLowerCase().includes(kw) || (it.cells[5]||"").toLowerCase().includes(kw));
       filtered.sort((a,b) => {
           let va, vb;
@@ -1153,7 +1173,6 @@
           // r[0]:날짜, r[1]:발주번호, r[2]:팀, r[3]:담당, r[4]:공사명, r[5]:내용
           const isChk1 = normalizeBool(r[6]), isChk2 = normalizeBool(r[7]), isChk3 = normalizeBool(r[8]), isChk4 = normalizeBool(r[9]);
           const tr = document.createElement("tr");
-          // 발주번호 열 추가됨
           tr.innerHTML = `<td>${formatDate(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
               <td style="text-align:center;">
                 <span class="status-badge ${isChk1?'active-1':''}" onclick="toggleDeliveryStatus(${it.row}, 'chk1', ${!isChk1})">발주확인</span>
@@ -1295,7 +1314,7 @@
 
   /* 초기화 */
   toggleScheduleView('calendar'); loadSchedule(true); loadPhonebook(); loadBucket(); fetchOrderData(); loadEquipmentSpec(); loadPrework(); loadDelivery(); 
-  loadChecklist(); // 점검일지 로드
+  loadChecklist(); 
 </script>
 </body>
 </html>
