@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.9 (Bucket Dashboard)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.9 (Structured Bucket)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -121,7 +121,7 @@
     }
     .bk-card:hover { transform: translateY(-3px); border-color: var(--primary-color); }
     .bk-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-    .bk-dept { font-size: 1.1em; font-weight: bold; color: #fff; }
+    .bk-dept { font-size: 1.2em; font-weight: bold; color: #fff; }
     .bk-latest-date { font-size: 0.9em; color: #aaa; }
     .bk-elapsed-box { 
         background: #222; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; 
@@ -139,7 +139,7 @@
     .bk-history-list { display: none; margin-top: 10px; background: #252525; padding: 10px; border-radius: 6px; }
     .bk-history-item { 
         display: flex; justify-content: space-between; font-size: 0.85em; 
-        padding: 6px 0; border-bottom: 1px solid #333; color: #ccc;
+        padding: 6px 0; border-bottom: 1px solid #333; color: #ccc; align-items:center;
     }
     .bk-history-item:last-child { border-bottom: none; }
 
@@ -568,7 +568,7 @@
         <div class="card admin-only">
           <h3>버켓 교체 기록</h3>
           <div class="flex-row">
-            <input type="text" id="bkDept" placeholder="부서/호기 (예: OF1팀 - 1호기)">
+            <input type="text" id="bkDept" placeholder="부서/호기 (예: 저광사 서쪽)">
             <input type="date" id="bkDate">
             <input type="text" id="bkNote" placeholder="비고">
             <button onclick="saveBucket()" class="btn-primary">저장</button>
@@ -927,11 +927,8 @@
     renderPaginator("pagination", totalPages, (p)=>{schedulePage=p;renderSchedule();}, schedulePage);
   }
 
-  /* [수정] 팝업 없이 즉시 등록 & 버튼 상태 갱신 */
+  /* 팝업 없이 즉시 등록 & 버튼 상태 갱신 */
   async function transferToPrework(data) {
-      // 이미 등록된 경우 중복 방지 (선택 사항)
-      // if(isPreworkRegistered(data)) { return; } 
-
       try {
           const payload = {
               action: "prework_add",
@@ -941,14 +938,11 @@
               work: data["작업내용"]
           };
           
-          // 전송 (await로 완료 대기)
           const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
           const result = await res.json();
           
           if(result.status === "success") {
-              // 성공 시: 백그라운드에서 선작업 데이터 리로드 -> 화면 갱신 (버튼 색상 변경)
               await loadPrework(); 
-              // 현재 뷰에 따라 화면 갱신
               if(currentView === 'calendar') {
                   renderCalendar();
                   updateDetailPanel(selectedDate);
@@ -1107,37 +1101,38 @@
   async function deletePhone(row){ if(confirm("삭제?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"phone_delete",row})}); loadPhonebook(); } }
   document.getElementById("pbSearch").addEventListener("input",()=>{pbPage=1;renderPhonebookTable();});
 
-  /* [NEW] 버켓주기 (Dashboard View) */
+  /* [NEW] 버켓주기 (Structured Dashboard) */
   let bkRowMap = new Map();
   let bkAllData = [];
-  let bkSelectedTeam = "ALL"; // 필터 상태 (ALL or 팀이름)
+  let bkSelectedTeam = "제련1팀"; // 기본 선택
+
+  // [핵심] 분류 고정 구조
+  const TEAM_STRUCTURE = {
+      "제련1팀": ["저광사 서쪽", "저광사 동쪽", "SF1 PIT"],
+      "제련2팀": ["저광사 남쪽", "저광사 북쪽", "SF2 PIT"],
+      "제련3팀": ["TSL1 PIT", "TSL2 PIT"],
+      "OF2팀": ["OF2 PIT", "OF4 PIT"],
+      "동순환자원팀": ["동순환자원 PIT"]
+  };
 
   async function loadBucket(){ 
       const res = await fetch(API_URL+"?action=bucket_get"); 
       const rows = await res.json(); 
       if(!rows || rows.length === 0) return;
       bkRowMap.clear(); 
-      bkAllData = rows.slice(1).map((r,i)=>({row:i+2, cells:r})); // r[0]:부서/호기, r[1]:날짜, r[2]:비고
+      // r[0]:부서/호기, r[1]:날짜, r[2]:비고
+      bkAllData = rows.slice(1).map((r,i)=>({row:i+2, cells:r})); 
       bkAllData.forEach(it=>bkRowMap.set(it.row,it.cells)); 
       
       renderBucketFilters();
       renderBucketCards(); 
   }
 
-  // 1. 팀별 필터 버튼 생성
   function renderBucketFilters() {
-      // 부서명만 추출 (예: "OF1팀 - 1호기" -> "OF1팀")
-      const teams = new Set();
-      bkAllData.forEach(it => {
-          const deptRaw = it.cells[0] || "";
-          const teamName = deptRaw.split('-')[0].trim(); // 하이픈 기준 앞부분만 추출
-          if(teamName) teams.add(teamName);
-      });
-      
       const container = document.getElementById("bkFilterContainer");
-      container.innerHTML = `<button class="bk-filter-btn ${bkSelectedTeam==='ALL'?'active':''}" onclick="setBucketFilter('ALL')">전체 보기</button>`;
-      
-      Array.from(teams).sort().forEach(team => {
+      container.innerHTML = "";
+      // 고정된 팀 구조 순서대로 버튼 생성
+      Object.keys(TEAM_STRUCTURE).forEach(team => {
           const isActive = bkSelectedTeam === team ? 'active' : '';
           container.innerHTML += `<button class="bk-filter-btn ${isActive}" onclick="setBucketFilter('${team}')">${team}</button>`;
       });
@@ -1145,68 +1140,63 @@
 
   function setBucketFilter(team) {
       bkSelectedTeam = team;
-      renderBucketFilters(); // 버튼 활성상태 갱신
-      renderBucketCards();   // 카드 리스트 갱신
+      renderBucketFilters(); 
+      renderBucketCards();   
   }
 
-  // 2. 대시보드 카드 렌더링
   function renderBucketCards() {
       const container = document.getElementById("bkDashboard");
       container.innerHTML = "";
 
-      // 데이터 그룹화 (호기별로 묶기)
-      // Key: "OF1팀 - 1호기", Value: [History Array]
-      const grouped = {};
-      
-      bkAllData.forEach(it => {
-          const deptRaw = it.cells[0] || "미지정";
-          const teamName = deptRaw.split('-')[0].trim();
-          
-          // 필터 적용
-          if(bkSelectedTeam !== 'ALL' && teamName !== bkSelectedTeam) return;
+      const targetLocations = TEAM_STRUCTURE[bkSelectedTeam] || [];
 
-          if(!grouped[deptRaw]) grouped[deptRaw] = [];
-          grouped[deptRaw].push(it);
-      });
-
-      // 그룹별 카드 생성
-      Object.keys(grouped).sort().forEach(key => {
-          const history = grouped[key];
-          // 날짜 내림차순 정렬 (최신순)
-          history.sort((a,b) => new Date(b.cells[1]) - new Date(a.cells[1]));
+      targetLocations.forEach(locName => {
+          // 해당 설비 이름이 포함된 데이터 찾기
+          const matched = bkAllData.filter(it => (it.cells[0]||"").includes(locName));
           
-          const latest = history[0];
-          const latestDateStr = latest.cells[1];
-          const elapsed = getElapsedDays(latestDateStr);
+          // 최신순 정렬
+          matched.sort((a,b) => new Date(b.cells[1]) - new Date(a.cells[1]));
           
-          // 경과일에 따른 색상
-          let elapsedClass = "bk-elapsed-val"; // 기본(초록)
-          if(elapsed > 180) elapsedClass += " danger"; // 6개월 초과
-          else if(elapsed > 90) elapsedClass += " warn"; // 3개월 초과
+          const latest = matched.length > 0 ? matched[0] : null;
+          const latestDateStr = latest ? latest.cells[1] : "";
+          const elapsed = latest ? getElapsedDays(latestDateStr) : 0;
+          
+          // 색상 로직
+          let elapsedClass = "bk-elapsed-val"; 
+          if(elapsed > 180) elapsedClass += " danger"; 
+          else if(elapsed > 90) elapsedClass += " warn";
 
-          // 카드 HTML
+          // 카드 HTML 생성
           const card = document.createElement("div");
           card.className = "bk-card";
+          
+          let historyHtml = "";
+          if(matched.length > 0) {
+              historyHtml = matched.map(h => `
+                  <div class="bk-history-item">
+                      <span>${formatDate(h.cells[1])}</span>
+                      <span style="color:#aaa;">${h.cells[2] || '-'}</span>
+                      <button onclick='deleteBucket(${h.row})' class="btn-danger admin-only" style="padding:0 4px; font-size:0.7em;">x</button>
+                  </div>
+              `).join('');
+          } else {
+              historyHtml = "<div style='text-align:center; padding:10px; color:#666;'>기록 없음</div>";
+          }
+
           card.innerHTML = `
               <div class="bk-header">
-                  <div class="bk-dept">${key}</div>
-                  <button onclick='deleteBucket(${latest.row})' class="btn-danger admin-only" style="padding:2px 6px; font-size:0.8em;">🗑️</button>
+                  <div class="bk-dept">${locName}</div>
               </div>
-              <div class="bk-latest-date">최근 교체: ${formatDate(latestDateStr)}</div>
+              <div class="bk-latest-date">최근 교체: ${latest ? formatDate(latestDateStr) : "-"}</div>
               <div class="bk-elapsed-box">
                   <div class="bk-elapsed-label">교체 후 경과 시간</div>
-                  <div class="${elapsedClass}">${elapsed}일</div>
+                  <div class="${elapsedClass}">${latest ? elapsed + "일" : "-"}</div>
               </div>
               <div class="bk-history-toggle" onclick="toggleHistory(this)">
-                  ▼ 지난 기록 보기 (${history.length}건)
+                  ▼ 지난 기록 보기 (${matched.length}건)
               </div>
               <div class="bk-history-list">
-                  ${history.map(h => `
-                      <div class="bk-history-item">
-                          <span>${formatDate(h.cells[1])}</span>
-                          <span style="color:#aaa;">${h.cells[2] || '-'}</span>
-                      </div>
-                  `).join('')}
+                  ${historyHtml}
               </div>
           `;
           container.appendChild(card);
