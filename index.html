@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.7 (Smart Sync)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.8 (Fast Sync)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -94,8 +94,10 @@
     .btn-primary { background: var(--primary-color); border-color: var(--primary-color); }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-danger { background: var(--danger-color); border-color: var(--danger-color); color: #000; }
-    .btn-accent { background: var(--accent-color); border-color: var(--accent-color); color: #000; font-weight:bold; }
-    .btn-accent:hover { background: #02b3a3; }
+    
+    /* 선작업 버튼 스타일: 등록 전(기본), 등록 후(형광) */
+    .btn-prework { background: #444; color: #fff; border: 1px solid #555; } /* 등록 전: 수정 버튼과 동일 */
+    .btn-prework.registered { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); } /* 등록 후 */
     
     .table-container { overflow-x: auto; margin-top: 15px; }
     table { width: 100%; border-collapse: collapse; min-width: 800px; }
@@ -223,9 +225,10 @@
       .content-area { padding: 15px; }
     }
 
+    /* --- [보안] 로그인 및 권한 관리 스타일 --- */
     #loginOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #121212; z-index: 9999; 
+      background-color: #121212; z-index: 9999; /* 최상위 */
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .login-box {
@@ -245,7 +248,9 @@
     }
     .login-btn:hover { background: var(--primary-hover); }
 
+    /* [핵심] 권한 제어 클래스: 기본 숨김 */
     .admin-only { display: none !important; }
+    /* 관리자 모드일 때만 보이기 */
     body.is-admin .admin-only { display: inline-block !important; }
     body.is-admin div.admin-only { display: block !important; }
   </style>
@@ -269,7 +274,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.7</span>
+      <span class="sub-text">통합 관리 시스템 v6.8</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -739,7 +744,7 @@
   let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null, currentDlRow=null, currentClRow=null; 
   function normalizeBool(val) { if (val === true || val === false) return val; if (!val) return false; const str = String(val).trim().toUpperCase(); return str === 'TRUE' || str === '허가' || str === '완료'; }
 
-  /* ================= 1. 일정관리 (수정: 선작업 등록 버튼 추가) ================= */
+  /* ================= 1. 일정관리 (Smart Sync 적용) ================= */
   const schedulePageSize=10; 
   const FIELDS=["날짜","생산팀","작업내용","담당자","발주번호","필수자재","허가번호","비고","설비ID"];
   let schedulePage=1, records=[], searchQuery="", sortKey="날짜", sortAsc=true, dateFilter={start:null, end:null}; 
@@ -803,6 +808,26 @@
       }
   }
 
+  // [수정] 선작업 등록 여부 확인용 헬퍼 함수
+  function isPreworkRegistered(schRow) {
+      if (!pwRowMap || pwRowMap.size === 0) return false;
+      const schDate = formatDate(schRow["날짜"]);
+      const schTeam = schRow["생산팀"];
+      const schWork = schRow["작업내용"];
+      
+      for (let [row, cells] of pwRowMap) {
+          // Prework data structure: 0:Date, 1:Team, 2:Manager, 3:Work
+          const pwDate = formatDate(cells[0]);
+          const pwTeam = cells[1];
+          const pwWork = cells[3];
+          
+          if (schDate === pwDate && schTeam === pwTeam && schWork === pwWork) {
+              return true;
+          }
+      }
+      return false;
+  }
+
   function updateDetailPanel(dateStr) {
       document.getElementById('detailTitle').textContent = `${dateStr} 일정 목록`;
       const container = document.getElementById('detailListContainer');
@@ -820,9 +845,12 @@
           if(r['필수자재']) { html += `<div class="sch-mat">🛠️ ${r['필수자재']}</div>`; }
           if(r['비고']) { html += `<div class="sch-note">🗒️ 비고: ${r['비고']}</div>`; }
           
-          // 관리 버튼 영역: 선작업 버튼 추가
+          // [수정] 버튼 스타일 로직 적용
+          const isRegistered = isPreworkRegistered(r);
+          const btnClass = isRegistered ? "btn-prework registered" : "btn-prework";
+          
           html += `<div class="sch-actions">
-                    <button onclick='transferToPrework(${JSON.stringify(r)})' class="btn-accent admin-only" title="선작업 관리로 등록">📝 선작업</button>
+                    <button onclick='transferToPrework(${JSON.stringify(r)})' class="${btnClass} admin-only">📝 선작업</button>
                     <button onclick="openScheduleModal(${r.row})" class="admin-only">✏️</button>
                     <button onclick="deleteRecord(${r.row})" class="btn-danger admin-only">🗑️</button>
                    </div>`;
@@ -871,9 +899,13 @@
         else { td.textContent = val; }
         tr.appendChild(td);
       });
-      // 테이블 행 관리 버튼: 선작업 버튼 추가
+      
+      // [수정] 버튼 스타일 로직 적용
+      const isRegistered = isPreworkRegistered(r);
+      const btnClass = isRegistered ? "btn-prework registered" : "btn-prework";
+
       tr.innerHTML += `<td>
-          <button onclick='transferToPrework(${JSON.stringify(r)})' class="btn-accent admin-only" style="padding:4px 8px;">📝 선작업</button>
+          <button onclick='transferToPrework(${JSON.stringify(r)})' class="${btnClass} admin-only" style="padding:4px 8px;">📝 선작업</button>
           <button onclick="openScheduleModal(${r.row})" class="admin-only">✏️</button> 
           <button onclick="deleteRecord(${r.row})" class="btn-danger admin-only">🗑️</button>
         </td>`;
@@ -882,12 +914,12 @@
     renderPaginator("pagination", totalPages, (p)=>{schedulePage=p;renderSchedule();}, schedulePage);
   }
 
-  /* [핵심] 일정내용을 선작업으로 자동 전송하는 함수 */
+  /* [수정] 팝업 없이 즉시 등록 & 버튼 상태 갱신 */
   async function transferToPrework(data) {
-      if(!confirm(`[${data['작업내용']}] 건을 선작업 관리로 등록하시겠습니까?`)) return;
-      
+      // 이미 등록된 경우 확인 불필요 (재등록 원할 수 있으므로 막지는 않음, 원하시면 주석 해제)
+      // if(isPreworkRegistered(data)) { alert("이미 등록된 건입니다."); return; }
+
       try {
-          // 선작업 add 요청 (v6.6 구조: 날짜, 생산팀, 담당자, 작업내용)
           const payload = {
               action: "prework_add",
               date: formatDate(data["날짜"]),
@@ -896,21 +928,25 @@
               work: data["작업내용"]
           };
           
+          // 전송 (await로 완료 대기)
           const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
           const result = await res.json();
           
           if(result.status === "success") {
-              if(confirm("선작업 관리에 등록되었습니다.\n확인을 위해 '선작업 관리' 탭으로 이동할까요?")) {
-                  switchTab('prework');
-                  loadPrework();
+              // 성공 시: 백그라운드에서 선작업 데이터 리로드 -> 화면 갱신 (버튼 색상 변경)
+              await loadPrework(); 
+              // 현재 뷰에 따라 화면 갱신
+              if(currentView === 'calendar') {
+                  renderCalendar();
+                  updateDetailPanel(selectedDate);
               } else {
-                  loadPrework(); // 백그라운드에서 로드만 수행
+                  renderSchedule();
               }
           } else {
-              alert("등록 실패: " + result.message);
+              alert("오류: " + result.message);
           }
       } catch (e) {
-          alert("오류 발생: " + e.toString());
+          alert("통신 오류: " + e.toString());
       }
   }
 
@@ -1054,7 +1090,7 @@
   function renderPhonebookTable(){ const kw=(document.getElementById('pbSearch').value||"").toLowerCase(); const filtered=pbAllData.filter(it=>it.cells.join(" ").toLowerCase().includes(kw)); const totalPages=Math.ceil(filtered.length/pageSizePhone)||1; if(pbPage>totalPages) pbPage=1; const start=(pbPage-1)*pageSizePhone, end=start+pageSizePhone; const tb=document.querySelector("#pbTable tbody"); tb.innerHTML=""; filtered.slice(start,end).forEach(it=>{ const r=it.cells; const tr=document.createElement("tr"); tr.innerHTML=`<td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><button onclick='openPhoneModal(${it.row})' class="admin-only">✏️</button> <button onclick='deletePhone(${it.row})' class="btn-danger admin-only">🗑️</button></td>`; tb.appendChild(tr); }); renderPaginator("pbPagination",totalPages,(p)=>{pbPage=p;renderPhonebookTable();},pbPage); }
   function openPhoneModal(row){ currentPbRow=row; const old=pbRowMap.get(row)||["","","",""]; document.getElementById('m_pbDept').value=old[0]; document.getElementById('m_pbPos').value=old[1]; document.getElementById('m_pbName').value=old[2]; document.getElementById('m_pbPhone').value=old[3]; openModal('phoneModal'); }
   async function savePhoneFromModal(){ const dept=document.getElementById('m_pbDept').value, pos=document.getElementById('m_pbPos').value, name=document.getElementById('m_pbName').value, phone=document.getElementById('m_pbPhone').value; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"phone_update",row:currentPbRow, dept,position:pos,name,phone})}); closeModal('phoneModal'); loadPhonebook(); }
-  async function savePhonebook(){ const dept=document.getElementById('pbDept').value, pos=document.getElementById('pbPosition').value, name=document.getElementById('pbName').value, phone=document.getElementById('pbPhone').value; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"phone_add",dept,position:pos,name,phone})}); ['pbDept','pbPosition','pbName','pbPhone'].forEach(id=>document.getElementById(id).value=""); loadPhonebook(); }
+  async function savePhonebook(){ const dept=document.getElementById('pbDept').value, pos=document.getElementById('pbPosition').value; const name=document.getElementById('pbName').value, phone=document.getElementById('pbPhone').value; await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"phone_add",dept,position:pos,name,phone})}); ['pbDept','pbPosition','pbName','pbPhone'].forEach(id=>document.getElementById(id).value=""); loadPhonebook(); }
   async function deletePhone(row){ if(confirm("삭제?")){ await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"phone_delete",row})}); loadPhonebook(); } }
   document.getElementById("pbSearch").addEventListener("input",()=>{pbPage=1;renderPhonebookTable();});
 
@@ -1085,4 +1121,3 @@
 </script>
 </body>
 </html>
-
