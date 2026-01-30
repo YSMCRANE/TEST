@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(주)영선기계 통합 관리 시스템 V6.4 (Checklist Pro)</title>
+  <title>(주)영선기계 통합 관리 시스템 V6.5 (Schedule Note Added)</title>
   
   <meta name="theme-color" content="#1e1e1e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2920/2920323.png">
@@ -114,8 +114,6 @@
     .status-badge.active-4 { background-color: #9C27B0 !important; color: #fff !important; } 
     .status-badge.permit-active { background-color: var(--primary-color) !important; color: #fff !important; } 
     .status-badge.done-active { background-color: var(--success-color) !important; color: #000 !important; } 
-    
-    /* 자재 관리용 뱃지 */
     .status-badge.order-active { background-color: var(--warning-color) !important; color: #000 !important; } 
     .status-badge.stock-active { background-color: var(--success-color) !important; color: #000 !important; } 
 
@@ -172,6 +170,7 @@
     .sch-work { font-size: 1.1em; font-weight: bold; color: #fff; line-height: 1.3; }
     .sch-meta { font-size: 0.85em; color: #ccc; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
     .sch-actions { position: absolute; top: 15px; right: 15px; }
+    .sch-note { font-size: 0.85em; color: #aaa; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #555; } /* 비고 스타일 추가 */
 
     /* 발주정보 카드 */
     .od-item-card { background: #252525; border: 1px solid #444; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; }
@@ -186,7 +185,7 @@
     .od-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; padding-top: 10px; border-top: 1px dashed #444; }
     .od-actions { display: flex; gap: 8px; align-items: center; }
 
-    /* [NEW] 점검일지 카드 스타일 (업그레이드) */
+    /* 점검일지 카드 스타일 */
     .cl-item-card { 
         background: #252525; border: 1px solid #444; border-radius: 12px; padding: 20px; 
         margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; 
@@ -195,7 +194,6 @@
     .cl-header-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .cl-team { color: var(--primary-color); font-weight: bold; font-size: 1.1em; }
     .cl-date { color: #aaa; font-size: 0.9em; }
-    /* 핵심: 점검내용 박스 스타일 */
     .cl-content-box { 
         background: #2f2f2f; padding: 15px; border-radius: 4px; color: #fff; 
         white-space: pre-wrap; line-height: 1.6; font-size: 1.05em; 
@@ -272,7 +270,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>(주)영선기계</h2>
-      <span class="sub-text">통합 관리 시스템 v6.4</span>
+      <span class="sub-text">통합 관리 시스템 v6.5</span>
     </div>
     <nav class="nav-menu">
       <div class="nav-group-label">메인 업무</div>
@@ -690,7 +688,7 @@
 
 <script>
   // [중요] 반드시 본인의 최신 Web App URL로 교체하세요!
-  const API_URL = "https://script.google.com/macros/s/AKfycbzMjpLQ5ThuX2gCHBAzMcF215kIrKTtMQsUdMWglXYhmiIR1bKgo9XMB_5gANql99Qguw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzmfoImopW4qx0Pdi2sz5-Jj-TN5BK0y4o1tI2JpNlTwOvd7ZIbxDR1fik022sTlS1SVg/exec";
   
   /* --- [보안] 로그인 설정 --- */
   const PW_ADMIN = "1984"; // 관리자용 (수정/삭제 가능)
@@ -740,7 +738,7 @@
   function renderPaginator(divId, totalPages, callback, currentPage){ const div = document.getElementById(divId); div.innerHTML = ""; if(totalPages < 2) return; let startP = Math.max(1, currentPage - 2); let endP = Math.min(totalPages, startP + 4); for(let i=startP; i<=endP; i++){ const b = document.createElement("button"); b.textContent = i; if(i === currentPage) b.classList.add("active"); b.onclick = () => callback(i); div.appendChild(b); } }
   function openModal(id) { document.getElementById(id).classList.add('show'); }
   function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-  let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null, currentDlRow=null, currentClRow=null; // currentClRow 추가
+  let currentSchRow=null, currentPbRow=null, currentBkRow=null, currentOdRow=null, currentPwRow=null, currentDlRow=null, currentClRow=null; 
   function normalizeBool(val) { if (val === true || val === false) return val; if (!val) return false; const str = String(val).trim().toUpperCase(); return str === 'TRUE' || str === '허가' || str === '완료'; }
 
   /* ================= 1. 일정관리 ================= */
@@ -822,6 +820,9 @@
           html += `<div class="sch-meta"><span>👤 ${r['담당자']}</span><span class="sch-divider">|</span><span>📦 ${poHtml}</span>`;
           if(r['허가번호']) { html += `<span class="sch-divider">|</span><span style="color:#81D4FA">🛡️ ${r['허가번호']}</span>`; } html += `</div>`;
           if(r['필수자재']) { html += `<div class="sch-mat">🛠️ ${r['필수자재']}</div>`; }
+          // [수정된 부분] 비고 표시 추가
+          if(r['비고']) { html += `<div class="sch-note">🗒️ 비고: ${r['비고']}</div>`; }
+          
           html += `<div class="sch-actions"><button onclick="openScheduleModal(${r.row})" style="padding:4px 8px; margin-right:4px;" class="admin-only">✏️</button><button onclick="deleteRecord(${r.row})" class="btn-danger admin-only" style="padding:4px 8px;">🗑️</button></div>`;
           div.innerHTML = html; container.appendChild(div);
       });
@@ -913,7 +914,7 @@
     scheduleChartInstance = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: '작업 건수', data, backgroundColor: 'rgba(74, 144, 226, 0.6)' }] }, options: { maintainAspectRatio:false, scales:{y:{beginAtZero:true}} } });
   });
 
-  /* ================= [수정됨] 2. 점검일지 (Checklist) - Card View 적용 ================= */
+  /* ================= 2. 점검일지 (Checklist - Card View) ================= */
   let clPage=1, pageSizeCl=10, clRowMap=new Map();
   
   async function loadChecklist(){ 
@@ -957,7 +958,6 @@
 
       filtered.slice(start,end).forEach(it => {
           const r = it.cells; 
-          // r[5]:주문자재, r[6]:보유자재, r[7]:주문확인, r[8]:보유확인
           const isOrderChecked = normalizeBool(r[7]);
           const isStockChecked = normalizeBool(r[8]);
           
@@ -966,7 +966,6 @@
           const card = document.createElement("div");
           card.className = "cl-item-card";
           
-          // 카드 내용 구성
           card.innerHTML = `
             <div class="cl-header">
                 <div class="cl-header-left">
